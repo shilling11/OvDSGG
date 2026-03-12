@@ -1,0 +1,1074 @@
+{
+    "cls2count": {
+        "__background__": {
+            "test": 0,
+            "total": 0,
+            "train": 0
+        },
+        "above": {
+            "test": 5,
+            "total": 65,
+            "train": 60
+        },
+        "away": {
+            "test": 7,
+            "total": 50,
+            "train": 43
+        },
+        "behind": {
+            "test": 33,
+            "total": 299,
+            "train": 266
+        },
+        "beneath": {
+            "test": 7,
+            "total": 91,
+            "train": 84
+        },
+        "bite": {
+            "test": 4,
+            "total": 54,
+            "train": 50
+        },
+        "chase": {
+            "test": 12,
+            "total": 95,
+            "train": 83
+        },
+        "creep_above": {
+            "test": 4,
+            "total": 9,
+            "train": 5
+        },
+        "creep_away": {
+            "test": 1,
+            "total": 2,
+            "train": 1
+        },
+        "creep_behind": {
+            "test": 18,
+            "total": 49,
+            "train": 31
+        },
+        "creep_beneath": {
+            "test": 4,
+            "total": 7,
+            "train": 3
+        },
+        "creep_front": {
+            "test": 14,
+            "total": 68,
+            "train": 54
+        },
+        "creep_left": {
+            "test": 17,
+            "total": 57,
+            "train": 40
+        },
+        "creep_next_to": {
+            "test": 2,
+            "total": 17,
+            "train": 15
+        },
+        "creep_past": {
+            "test": 2,
+            "total": 20,
+            "train": 18
+        },
+        "creep_right": {
+            "test": 11,
+            "total": 59,
+            "train": 48
+        },
+        "creep_toward": {
+            "test": 1,
+            "total": 18,
+            "train": 17
+        },
+        "drive": {
+            "test": 3,
+            "total": 34,
+            "train": 31
+        },
+        "fall_off": {
+            "test": 1,
+            "total": 5,
+            "train": 4
+        },
+        "faster": {
+            "test": 21,
+            "total": 110,
+            "train": 89
+        },
+        "feed": {
+            "test": 9,
+            "total": 54,
+            "train": 45
+        },
+        "fight": {
+            "test": 8,
+            "total": 191,
+            "train": 183
+        },
+        "fly_above": {
+            "test": 4,
+            "total": 40,
+            "train": 36
+        },
+        "fly_away": {
+            "test": 1,
+            "total": 9,
+            "train": 8
+        },
+        "fly_behind": {
+            "test": 2,
+            "total": 18,
+            "train": 16
+        },
+        "fly_front": {
+            "test": 1,
+            "total": 11,
+            "train": 10
+        },
+        "fly_left": {
+            "test": 2,
+            "total": 14,
+            "train": 12
+        },
+        "fly_next_to": {
+            "test": 22,
+            "total": 178,
+            "train": 156
+        },
+        "fly_past": {
+            "test": 4,
+            "total": 13,
+            "train": 9
+        },
+        "fly_right": {
+            "test": 2,
+            "total": 11,
+            "train": 9
+        },
+        "fly_toward": {
+            "test": 3,
+            "total": 5,
+            "train": 2
+        },
+        "fly_with": {
+            "test": 70,
+            "total": 744,
+            "train": 674
+        },
+        "follow": {
+            "test": 25,
+            "total": 319,
+            "train": 294
+        },
+        "front": {
+            "test": 60,
+            "total": 351,
+            "train": 291
+        },
+        "hold": {
+            "test": 8,
+            "total": 84,
+            "train": 76
+        },
+        "jump_above": {
+            "test": 2,
+            "total": 16,
+            "train": 14
+        },
+        "jump_away": {
+            "test": 3,
+            "total": 19,
+            "train": 16
+        },
+        "jump_behind": {
+            "test": 8,
+            "total": 27,
+            "train": 19
+        },
+        "jump_beneath": {
+            "test": 13,
+            "total": 87,
+            "train": 74
+        },
+        "jump_front": {
+            "test": 15,
+            "total": 67,
+            "train": 52
+        },
+        "jump_left": {
+            "test": 18,
+            "total": 68,
+            "train": 50
+        },
+        "jump_next_to": {
+            "test": 10,
+            "total": 16,
+            "train": 6
+        },
+        "jump_past": {
+            "test": 2,
+            "total": 16,
+            "train": 14
+        },
+        "jump_right": {
+            "test": 20,
+            "total": 54,
+            "train": 34
+        },
+        "jump_toward": {
+            "test": 8,
+            "total": 18,
+            "train": 10
+        },
+        "jump_with": {
+            "test": 2,
+            "total": 10,
+            "train": 8
+        },
+        "kick": {
+            "test": 1,
+            "total": 2,
+            "train": 1
+        },
+        "larger": {
+            "test": 117,
+            "total": 1278,
+            "train": 1161
+        },
+        "left": {
+            "test": 42,
+            "total": 424,
+            "train": 382
+        },
+        "lie_above": {
+            "test": 4,
+            "total": 36,
+            "train": 32
+        },
+        "lie_behind": {
+            "test": 39,
+            "total": 202,
+            "train": 163
+        },
+        "lie_beneath": {
+            "test": 2,
+            "total": 49,
+            "train": 47
+        },
+        "lie_front": {
+            "test": 34,
+            "total": 220,
+            "train": 186
+        },
+        "lie_inside": {
+            "test": 1,
+            "total": 2,
+            "train": 1
+        },
+        "lie_left": {
+            "test": 51,
+            "total": 223,
+            "train": 172
+        },
+        "lie_next_to": {
+            "test": 29,
+            "total": 169,
+            "train": 140
+        },
+        "lie_right": {
+            "test": 57,
+            "total": 248,
+            "train": 191
+        },
+        "lie_with": {
+            "test": 2,
+            "total": 16,
+            "train": 14
+        },
+        "move_above": {
+            "test": 1,
+            "total": 3,
+            "train": 2
+        },
+        "move_away": {
+            "test": 1,
+            "total": 58,
+            "train": 57
+        },
+        "move_behind": {
+            "test": 83,
+            "total": 442,
+            "train": 359
+        },
+        "move_beneath": {
+            "test": 65,
+            "total": 367,
+            "train": 302
+        },
+        "move_front": {
+            "test": 40,
+            "total": 434,
+            "train": 394
+        },
+        "move_left": {
+            "test": 56,
+            "total": 415,
+            "train": 359
+        },
+        "move_next_to": {
+            "test": 8,
+            "total": 116,
+            "train": 108
+        },
+        "move_past": {
+            "test": 11,
+            "total": 161,
+            "train": 150
+        },
+        "move_right": {
+            "test": 47,
+            "total": 451,
+            "train": 404
+        },
+        "move_toward": {
+            "test": 8,
+            "total": 87,
+            "train": 79
+        },
+        "move_with": {
+            "test": 22,
+            "total": 178,
+            "train": 156
+        },
+        "next_to": {
+            "test": 18,
+            "total": 187,
+            "train": 169
+        },
+        "past": {
+            "test": 6,
+            "total": 46,
+            "train": 40
+        },
+        "play": {
+            "test": 79,
+            "total": 635,
+            "train": 556
+        },
+        "pull": {
+            "test": 3,
+            "total": 70,
+            "train": 67
+        },
+        "ride": {
+            "test": 71,
+            "total": 491,
+            "train": 420
+        },
+        "right": {
+            "test": 50,
+            "total": 391,
+            "train": 341
+        },
+        "run_above": {
+            "test": 1,
+            "total": 8,
+            "train": 7
+        },
+        "run_away": {
+            "test": 8,
+            "total": 46,
+            "train": 38
+        },
+        "run_behind": {
+            "test": 13,
+            "total": 118,
+            "train": 105
+        },
+        "run_beneath": {
+            "test": 5,
+            "total": 59,
+            "train": 54
+        },
+        "run_front": {
+            "test": 24,
+            "total": 151,
+            "train": 127
+        },
+        "run_left": {
+            "test": 31,
+            "total": 172,
+            "train": 141
+        },
+        "run_next_to": {
+            "test": 8,
+            "total": 38,
+            "train": 30
+        },
+        "run_past": {
+            "test": 14,
+            "total": 59,
+            "train": 45
+        },
+        "run_right": {
+            "test": 32,
+            "total": 183,
+            "train": 151
+        },
+        "run_toward": {
+            "test": 9,
+            "total": 41,
+            "train": 32
+        },
+        "run_with": {
+            "test": 10,
+            "total": 98,
+            "train": 88
+        },
+        "sit_above": {
+            "test": 78,
+            "total": 476,
+            "train": 398
+        },
+        "sit_behind": {
+            "test": 47,
+            "total": 339,
+            "train": 292
+        },
+        "sit_beneath": {
+            "test": 20,
+            "total": 62,
+            "train": 42
+        },
+        "sit_front": {
+            "test": 48,
+            "total": 344,
+            "train": 296
+        },
+        "sit_inside": {
+            "test": 3,
+            "total": 42,
+            "train": 39
+        },
+        "sit_left": {
+            "test": 74,
+            "total": 492,
+            "train": 418
+        },
+        "sit_next_to": {
+            "test": 38,
+            "total": 267,
+            "train": 229
+        },
+        "sit_right": {
+            "test": 89,
+            "total": 485,
+            "train": 396
+        },
+        "stand_above": {
+            "test": 35,
+            "total": 202,
+            "train": 167
+        },
+        "stand_behind": {
+            "test": 175,
+            "total": 1079,
+            "train": 904
+        },
+        "stand_beneath": {
+            "test": 6,
+            "total": 67,
+            "train": 61
+        },
+        "stand_front": {
+            "test": 158,
+            "total": 1023,
+            "train": 865
+        },
+        "stand_inside": {
+            "test": 2,
+            "total": 3,
+            "train": 1
+        },
+        "stand_left": {
+            "test": 244,
+            "total": 1430,
+            "train": 1186
+        },
+        "stand_next_to": {
+            "test": 118,
+            "total": 597,
+            "train": 479
+        },
+        "stand_right": {
+            "test": 262,
+            "total": 1504,
+            "train": 1242
+        },
+        "stand_with": {
+            "test": 64,
+            "total": 166,
+            "train": 102
+        },
+        "stop_above": {
+            "test": 2,
+            "total": 10,
+            "train": 8
+        },
+        "stop_behind": {
+            "test": 43,
+            "total": 516,
+            "train": 473
+        },
+        "stop_beneath": {
+            "test": 13,
+            "total": 29,
+            "train": 16
+        },
+        "stop_front": {
+            "test": 14,
+            "total": 322,
+            "train": 308
+        },
+        "stop_left": {
+            "test": 48,
+            "total": 479,
+            "train": 431
+        },
+        "stop_next_to": {
+            "test": 10,
+            "total": 130,
+            "train": 120
+        },
+        "stop_right": {
+            "test": 54,
+            "total": 391,
+            "train": 337
+        },
+        "stop_with": {
+            "test": 2,
+            "total": 6,
+            "train": 4
+        },
+        "swim_behind": {
+            "test": 13,
+            "total": 43,
+            "train": 30
+        },
+        "swim_beneath": {
+            "test": 1,
+            "total": 17,
+            "train": 16
+        },
+        "swim_front": {
+            "test": 60,
+            "total": 104,
+            "train": 44
+        },
+        "swim_left": {
+            "test": 58,
+            "total": 88,
+            "train": 30
+        },
+        "swim_next_to": {
+            "test": 25,
+            "total": 52,
+            "train": 27
+        },
+        "swim_right": {
+            "test": 63,
+            "total": 122,
+            "train": 59
+        },
+        "swim_with": {
+            "test": 84,
+            "total": 126,
+            "train": 42
+        },
+        "taller": {
+            "test": 133,
+            "total": 1235,
+            "train": 1102
+        },
+        "touch": {
+            "test": 38,
+            "total": 217,
+            "train": 179
+        },
+        "toward": {
+            "test": 6,
+            "total": 34,
+            "train": 28
+        },
+        "walk_above": {
+            "test": 12,
+            "total": 51,
+            "train": 39
+        },
+        "walk_away": {
+            "test": 47,
+            "total": 188,
+            "train": 141
+        },
+        "walk_behind": {
+            "test": 135,
+            "total": 856,
+            "train": 721
+        },
+        "walk_beneath": {
+            "test": 17,
+            "total": 86,
+            "train": 69
+        },
+        "walk_front": {
+            "test": 165,
+            "total": 917,
+            "train": 752
+        },
+        "walk_left": {
+            "test": 209,
+            "total": 1124,
+            "train": 915
+        },
+        "walk_next_to": {
+            "test": 88,
+            "total": 480,
+            "train": 392
+        },
+        "walk_past": {
+            "test": 34,
+            "total": 209,
+            "train": 175
+        },
+        "walk_right": {
+            "test": 216,
+            "total": 1143,
+            "train": 927
+        },
+        "walk_toward": {
+            "test": 43,
+            "total": 225,
+            "train": 182
+        },
+        "walk_with": {
+            "test": 52,
+            "total": 346,
+            "train": 294
+        },
+        "watch": {
+            "test": 97,
+            "total": 705,
+            "train": 608
+        }
+    },
+    "cls2id": {
+        "__background__": 0,
+        "above": 72,
+        "away": 73,
+        "behind": 1,
+        "beneath": 74,
+        "bite": 75,
+        "chase": 2,
+        "creep_above": 76,
+        "creep_away": 77,
+        "creep_behind": 3,
+        "creep_beneath": 4,
+        "creep_front": 5,
+        "creep_left": 6,
+        "creep_next_to": 78,
+        "creep_past": 79,
+        "creep_right": 7,
+        "creep_toward": 80,
+        "drive": 81,
+        "fall_off": 8,
+        "faster": 9,
+        "feed": 82,
+        "fight": 83,
+        "fly_above": 10,
+        "fly_away": 84,
+        "fly_behind": 85,
+        "fly_front": 86,
+        "fly_left": 87,
+        "fly_next_to": 11,
+        "fly_past": 12,
+        "fly_right": 88,
+        "fly_toward": 13,
+        "fly_with": 14,
+        "follow": 15,
+        "front": 16,
+        "hold": 89,
+        "jump_above": 90,
+        "jump_away": 91,
+        "jump_behind": 92,
+        "jump_beneath": 17,
+        "jump_front": 18,
+        "jump_left": 19,
+        "jump_next_to": 20,
+        "jump_past": 93,
+        "jump_right": 21,
+        "jump_toward": 22,
+        "jump_with": 94,
+        "kick": 95,
+        "larger": 23,
+        "left": 24,
+        "lie_above": 96,
+        "lie_behind": 25,
+        "lie_beneath": 97,
+        "lie_front": 26,
+        "lie_inside": 98,
+        "lie_left": 27,
+        "lie_next_to": 28,
+        "lie_right": 29,
+        "lie_with": 99,
+        "move_above": 100,
+        "move_away": 101,
+        "move_behind": 30,
+        "move_beneath": 31,
+        "move_front": 32,
+        "move_left": 33,
+        "move_next_to": 102,
+        "move_past": 103,
+        "move_right": 34,
+        "move_toward": 104,
+        "move_with": 35,
+        "next_to": 36,
+        "past": 105,
+        "play": 37,
+        "pull": 106,
+        "ride": 38,
+        "right": 39,
+        "run_above": 107,
+        "run_away": 108,
+        "run_behind": 40,
+        "run_beneath": 109,
+        "run_front": 41,
+        "run_left": 42,
+        "run_next_to": 110,
+        "run_past": 43,
+        "run_right": 44,
+        "run_toward": 111,
+        "run_with": 45,
+        "sit_above": 46,
+        "sit_behind": 112,
+        "sit_beneath": 113,
+        "sit_front": 47,
+        "sit_inside": 114,
+        "sit_left": 48,
+        "sit_next_to": 115,
+        "sit_right": 49,
+        "stand_above": 116,
+        "stand_behind": 50,
+        "stand_beneath": 117,
+        "stand_front": 51,
+        "stand_inside": 118,
+        "stand_left": 52,
+        "stand_next_to": 53,
+        "stand_right": 54,
+        "stand_with": 119,
+        "stop_above": 120,
+        "stop_behind": 55,
+        "stop_beneath": 121,
+        "stop_front": 56,
+        "stop_left": 57,
+        "stop_next_to": 122,
+        "stop_right": 58,
+        "stop_with": 123,
+        "swim_behind": 124,
+        "swim_beneath": 125,
+        "swim_front": 59,
+        "swim_left": 60,
+        "swim_next_to": 126,
+        "swim_right": 61,
+        "swim_with": 62,
+        "taller": 63,
+        "touch": 64,
+        "toward": 127,
+        "walk_above": 128,
+        "walk_away": 129,
+        "walk_behind": 65,
+        "walk_beneath": 130,
+        "walk_front": 66,
+        "walk_left": 67,
+        "walk_next_to": 68,
+        "walk_past": 131,
+        "walk_right": 69,
+        "walk_toward": 132,
+        "walk_with": 70,
+        "watch": 71
+    },
+    "cls2split": {
+        "__background__": "__background__",
+        "above": "novel",
+        "away": "novel",
+        "behind": "base",
+        "beneath": "novel",
+        "bite": "novel",
+        "chase": "base",
+        "creep_above": "novel",
+        "creep_away": "novel",
+        "creep_behind": "base",
+        "creep_beneath": "base",
+        "creep_front": "base",
+        "creep_left": "base",
+        "creep_next_to": "novel",
+        "creep_past": "novel",
+        "creep_right": "base",
+        "creep_toward": "novel",
+        "drive": "novel",
+        "fall_off": "base",
+        "faster": "base",
+        "feed": "novel",
+        "fight": "novel",
+        "fly_above": "base",
+        "fly_away": "novel",
+        "fly_behind": "novel",
+        "fly_front": "novel",
+        "fly_left": "novel",
+        "fly_next_to": "base",
+        "fly_past": "base",
+        "fly_right": "novel",
+        "fly_toward": "base",
+        "fly_with": "base",
+        "follow": "base",
+        "front": "base",
+        "hold": "novel",
+        "jump_above": "novel",
+        "jump_away": "novel",
+        "jump_behind": "novel",
+        "jump_beneath": "base",
+        "jump_front": "base",
+        "jump_left": "base",
+        "jump_next_to": "base",
+        "jump_past": "novel",
+        "jump_right": "base",
+        "jump_toward": "base",
+        "jump_with": "novel",
+        "kick": "novel",
+        "larger": "base",
+        "left": "base",
+        "lie_above": "novel",
+        "lie_behind": "base",
+        "lie_beneath": "novel",
+        "lie_front": "base",
+        "lie_inside": "novel",
+        "lie_left": "base",
+        "lie_next_to": "base",
+        "lie_right": "base",
+        "lie_with": "novel",
+        "move_above": "novel",
+        "move_away": "novel",
+        "move_behind": "base",
+        "move_beneath": "base",
+        "move_front": "base",
+        "move_left": "base",
+        "move_next_to": "novel",
+        "move_past": "novel",
+        "move_right": "base",
+        "move_toward": "novel",
+        "move_with": "base",
+        "next_to": "base",
+        "past": "novel",
+        "play": "base",
+        "pull": "novel",
+        "ride": "base",
+        "right": "base",
+        "run_above": "novel",
+        "run_away": "novel",
+        "run_behind": "base",
+        "run_beneath": "novel",
+        "run_front": "base",
+        "run_left": "base",
+        "run_next_to": "novel",
+        "run_past": "base",
+        "run_right": "base",
+        "run_toward": "novel",
+        "run_with": "base",
+        "sit_above": "base",
+        "sit_behind": "novel",
+        "sit_beneath": "novel",
+        "sit_front": "base",
+        "sit_inside": "novel",
+        "sit_left": "base",
+        "sit_next_to": "novel",
+        "sit_right": "base",
+        "stand_above": "novel",
+        "stand_behind": "base",
+        "stand_beneath": "novel",
+        "stand_front": "base",
+        "stand_inside": "novel",
+        "stand_left": "base",
+        "stand_next_to": "base",
+        "stand_right": "base",
+        "stand_with": "novel",
+        "stop_above": "novel",
+        "stop_behind": "base",
+        "stop_beneath": "novel",
+        "stop_front": "base",
+        "stop_left": "base",
+        "stop_next_to": "novel",
+        "stop_right": "base",
+        "stop_with": "novel",
+        "swim_behind": "novel",
+        "swim_beneath": "novel",
+        "swim_front": "base",
+        "swim_left": "base",
+        "swim_next_to": "novel",
+        "swim_right": "base",
+        "swim_with": "base",
+        "taller": "base",
+        "touch": "base",
+        "toward": "novel",
+        "walk_above": "novel",
+        "walk_away": "novel",
+        "walk_behind": "base",
+        "walk_beneath": "novel",
+        "walk_front": "base",
+        "walk_left": "base",
+        "walk_next_to": "base",
+        "walk_past": "novel",
+        "walk_right": "base",
+        "walk_toward": "novel",
+        "walk_with": "base",
+        "watch": "base"
+    },
+    "id2cls": {
+        "0": "__background__",
+        "1": "behind",
+        "10": "fly_above",
+        "100": "move_above",
+        "101": "move_away",
+        "102": "move_next_to",
+        "103": "move_past",
+        "104": "move_toward",
+        "105": "past",
+        "106": "pull",
+        "107": "run_above",
+        "108": "run_away",
+        "109": "run_beneath",
+        "11": "fly_next_to",
+        "110": "run_next_to",
+        "111": "run_toward",
+        "112": "sit_behind",
+        "113": "sit_beneath",
+        "114": "sit_inside",
+        "115": "sit_next_to",
+        "116": "stand_above",
+        "117": "stand_beneath",
+        "118": "stand_inside",
+        "119": "stand_with",
+        "12": "fly_past",
+        "120": "stop_above",
+        "121": "stop_beneath",
+        "122": "stop_next_to",
+        "123": "stop_with",
+        "124": "swim_behind",
+        "125": "swim_beneath",
+        "126": "swim_next_to",
+        "127": "toward",
+        "128": "walk_above",
+        "129": "walk_away",
+        "13": "fly_toward",
+        "130": "walk_beneath",
+        "131": "walk_past",
+        "132": "walk_toward",
+        "14": "fly_with",
+        "15": "follow",
+        "16": "front",
+        "17": "jump_beneath",
+        "18": "jump_front",
+        "19": "jump_left",
+        "2": "chase",
+        "20": "jump_next_to",
+        "21": "jump_right",
+        "22": "jump_toward",
+        "23": "larger",
+        "24": "left",
+        "25": "lie_behind",
+        "26": "lie_front",
+        "27": "lie_left",
+        "28": "lie_next_to",
+        "29": "lie_right",
+        "3": "creep_behind",
+        "30": "move_behind",
+        "31": "move_beneath",
+        "32": "move_front",
+        "33": "move_left",
+        "34": "move_right",
+        "35": "move_with",
+        "36": "next_to",
+        "37": "play",
+        "38": "ride",
+        "39": "right",
+        "4": "creep_beneath",
+        "40": "run_behind",
+        "41": "run_front",
+        "42": "run_left",
+        "43": "run_past",
+        "44": "run_right",
+        "45": "run_with",
+        "46": "sit_above",
+        "47": "sit_front",
+        "48": "sit_left",
+        "49": "sit_right",
+        "5": "creep_front",
+        "50": "stand_behind",
+        "51": "stand_front",
+        "52": "stand_left",
+        "53": "stand_next_to",
+        "54": "stand_right",
+        "55": "stop_behind",
+        "56": "stop_front",
+        "57": "stop_left",
+        "58": "stop_right",
+        "59": "swim_front",
+        "6": "creep_left",
+        "60": "swim_left",
+        "61": "swim_right",
+        "62": "swim_with",
+        "63": "taller",
+        "64": "touch",
+        "65": "walk_behind",
+        "66": "walk_front",
+        "67": "walk_left",
+        "68": "walk_next_to",
+        "69": "walk_right",
+        "7": "creep_right",
+        "70": "walk_with",
+        "71": "watch",
+        "72": "above",
+        "73": "away",
+        "74": "beneath",
+        "75": "bite",
+        "76": "creep_above",
+        "77": "creep_away",
+        "78": "creep_next_to",
+        "79": "creep_past",
+        "8": "fall_off",
+        "80": "creep_toward",
+        "81": "drive",
+        "82": "feed",
+        "83": "fight",
+        "84": "fly_away",
+        "85": "fly_behind",
+        "86": "fly_front",
+        "87": "fly_left",
+        "88": "fly_right",
+        "89": "hold",
+        "9": "faster",
+        "90": "jump_above",
+        "91": "jump_away",
+        "92": "jump_behind",
+        "93": "jump_past",
+        "94": "jump_with",
+        "95": "kick",
+        "96": "lie_above",
+        "97": "lie_beneath",
+        "98": "lie_inside",
+        "99": "lie_with"
+    }
+}

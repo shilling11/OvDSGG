@@ -1,0 +1,4 @@
+# ninja log v5
+2	24112	1773327852681343376	/app/models/ops/build/temp.linux-x86_64-cpython-312/app/models/ops/src/cpu/ms_deform_attn_cpu.o	893dde697ee6925d
+3	57822	1773327886368794042	/app/models/ops/build/temp.linux-x86_64-cpython-312/app/models/ops/src/vision.o	f8d829cc6a39dfb7
+2	106686	1773327935202447354	/app/models/ops/build/temp.linux-x86_64-cpython-312/app/models/ops/src/cuda/ms_deform_attn_cuda.o	96026b809061c836

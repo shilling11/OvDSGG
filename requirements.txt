@@ -1,0 +1,12 @@
+pycocotools
+tqdm
+cython
+scipy
+numpy
+opencv-python
+Pillow
+seaborn
+matplotlib
+pandas
+ftfy
+regex

@@ -1,0 +1,298 @@
+{
+    "cls2count": {
+        "__background__": {
+            "test": 0,
+            "total": 0,
+            "train": 0
+        },
+        "airplane": {
+            "test": 20,
+            "total": 123,
+            "train": 103
+        },
+        "antelope": {
+            "test": 8,
+            "total": 122,
+            "train": 114
+        },
+        "ball": {
+            "test": 2,
+            "total": 22,
+            "train": 20
+        },
+        "bear": {
+            "test": 9,
+            "total": 53,
+            "train": 44
+        },
+        "bicycle": {
+            "test": 54,
+            "total": 168,
+            "train": 114
+        },
+        "bird": {
+            "test": 21,
+            "total": 126,
+            "train": 105
+        },
+        "bus": {
+            "test": 1,
+            "total": 31,
+            "train": 30
+        },
+        "car": {
+            "test": 22,
+            "total": 270,
+            "train": 248
+        },
+        "cattle": {
+            "test": 13,
+            "total": 94,
+            "train": 81
+        },
+        "dog": {
+            "test": 42,
+            "total": 196,
+            "train": 154
+        },
+        "domestic_cat": {
+            "test": 3,
+            "total": 46,
+            "train": 43
+        },
+        "elephant": {
+            "test": 28,
+            "total": 117,
+            "train": 89
+        },
+        "fox": {
+            "test": 14,
+            "total": 64,
+            "train": 50
+        },
+        "frisbee": {
+            "test": 2,
+            "total": 5,
+            "train": 3
+        },
+        "giant_panda": {
+            "test": 16,
+            "total": 64,
+            "train": 48
+        },
+        "hamster": {
+            "test": 2,
+            "total": 11,
+            "train": 9
+        },
+        "horse": {
+            "test": 18,
+            "total": 84,
+            "train": 66
+        },
+        "lion": {
+            "test": 7,
+            "total": 63,
+            "train": 56
+        },
+        "lizard": {
+            "test": 8,
+            "total": 23,
+            "train": 15
+        },
+        "monkey": {
+            "test": 27,
+            "total": 128,
+            "train": 101
+        },
+        "motorcycle": {
+            "test": 10,
+            "total": 66,
+            "train": 56
+        },
+        "person": {
+            "test": 140,
+            "total": 526,
+            "train": 386
+        },
+        "rabbit": {
+            "test": 2,
+            "total": 39,
+            "train": 37
+        },
+        "red_panda": {
+            "test": 13,
+            "total": 53,
+            "train": 40
+        },
+        "sheep": {
+            "test": 2,
+            "total": 81,
+            "train": 79
+        },
+        "skateboard": {
+            "test": 1,
+            "total": 7,
+            "train": 6
+        },
+        "snake": {
+            "test": 2,
+            "total": 23,
+            "train": 21
+        },
+        "sofa": {
+            "test": 1,
+            "total": 13,
+            "train": 12
+        },
+        "squirrel": {
+            "test": 2,
+            "total": 33,
+            "train": 31
+        },
+        "tiger": {
+            "test": 2,
+            "total": 16,
+            "train": 14
+        },
+        "train": {
+            "test": 2,
+            "total": 28,
+            "train": 26
+        },
+        "turtle": {
+            "test": 1,
+            "total": 28,
+            "train": 27
+        },
+        "watercraft": {
+            "test": 18,
+            "total": 85,
+            "train": 67
+        },
+        "whale": {
+            "test": 24,
+            "total": 69,
+            "train": 45
+        },
+        "zebra": {
+            "test": 50,
+            "total": 140,
+            "train": 90
+        }
+    },
+    "cls2id": {
+        "__background__": 0,
+        "airplane": 1,
+        "antelope": 34,
+        "ball": 21,
+        "bear": 33,
+        "bicycle": 2,
+        "bird": 3,
+        "bus": 4,
+        "car": 5,
+        "cattle": 31,
+        "dog": 6,
+        "domestic_cat": 7,
+        "elephant": 8,
+        "fox": 29,
+        "frisbee": 22,
+        "giant_panda": 28,
+        "hamster": 9,
+        "horse": 26,
+        "lion": 10,
+        "lizard": 35,
+        "monkey": 11,
+        "motorcycle": 32,
+        "person": 25,
+        "rabbit": 12,
+        "red_panda": 30,
+        "sheep": 13,
+        "skateboard": 24,
+        "snake": 14,
+        "sofa": 23,
+        "squirrel": 15,
+        "tiger": 16,
+        "train": 17,
+        "turtle": 18,
+        "watercraft": 27,
+        "whale": 19,
+        "zebra": 20
+    },
+    "cls2split": {
+        "__background__": "__background__",
+        "airplane": "base",
+        "antelope": "novel",
+        "ball": "base",
+        "bear": "novel",
+        "bicycle": "base",
+        "bird": "base",
+        "bus": "base",
+        "car": "base",
+        "cattle": "novel",
+        "dog": "base",
+        "domestic_cat": "base",
+        "elephant": "base",
+        "fox": "novel",
+        "frisbee": "base",
+        "giant_panda": "novel",
+        "hamster": "base",
+        "horse": "novel",
+        "lion": "base",
+        "lizard": "novel",
+        "monkey": "base",
+        "motorcycle": "novel",
+        "person": "base",
+        "rabbit": "base",
+        "red_panda": "novel",
+        "sheep": "base",
+        "skateboard": "base",
+        "snake": "base",
+        "sofa": "base",
+        "squirrel": "base",
+        "tiger": "base",
+        "train": "base",
+        "turtle": "base",
+        "watercraft": "novel",
+        "whale": "base",
+        "zebra": "base"
+    },
+    "id2cls": {
+        "0": "__background__",
+        "1": "airplane",
+        "10": "lion",
+        "11": "monkey",
+        "12": "rabbit",
+        "13": "sheep",
+        "14": "snake",
+        "15": "squirrel",
+        "16": "tiger",
+        "17": "train",
+        "18": "turtle",
+        "19": "whale",
+        "2": "bicycle",
+        "20": "zebra",
+        "21": "ball",
+        "22": "frisbee",
+        "23": "sofa",
+        "24": "skateboard",
+        "25": "person",
+        "26": "horse",
+        "27": "watercraft",
+        "28": "giant_panda",
+        "29": "fox",
+        "3": "bird",
+        "30": "red_panda",
+        "31": "cattle",
+        "32": "motorcycle",
+        "33": "bear",
+        "34": "antelope",
+        "35": "lizard",
+        "4": "bus",
+        "5": "car",
+        "6": "dog",
+        "7": "domestic_cat",
+        "8": "elephant",
+        "9": "hamster"
+    }
+}
