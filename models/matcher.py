@@ -105,7 +105,7 @@ class HungarianMatcher(nn.Module):
 
             sizes = [len(v["boxes"]) for v in targets]
             #print("size", sizes)
-            indices = [linear_sum_assignment(c[i]) for i, c in enumerate(C.split(sizes, -1))]
+            indices = [linear_sum_assignment(C[i, :, sum(sizes[:k]):sum(sizes[:k])+s]) for k, (i, s) in enumerate(zip(range(bs), sizes))]
             return [(torch.as_tensor(i, dtype=torch.int64), torch.as_tensor(j, dtype=torch.int64)) for i, j in indices]
 
 
@@ -154,7 +154,7 @@ class RelationHungarianMatcher(nn.Module):
         C = C.view(bs, num_rel_queries, -1).cpu()
 
         sizes = [len(v["sub_boxes"]) for v in targets]
-        indices = [linear_sum_assignment(c[i]) for i, c in enumerate(C.split(sizes, -1))]
+        indices = [linear_sum_assignment(C[i, :, sum(sizes[:k]):sum(sizes[:k])+s]) for k, (i, s) in enumerate(zip(range(bs), sizes))]
         return [(torch.as_tensor(i, dtype=torch.int64), torch.as_tensor(j, dtype=torch.int64)) for i, j in indices]
 
 def build_matcher(args):

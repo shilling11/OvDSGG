@@ -213,7 +213,7 @@ class DeformableTransformer(nn.Module):
             return hs, init_reference_out, inter_references_out, enc_outputs_class, enc_outputs_coord_unact
         
         if self.fixed_pretrained_model:
-            print("fixed")
+            # print("fixed")
             memory = memory.detach()
             hs = hs.detach()
             inter_references = inter_references.detach()

@@ -16,6 +16,9 @@ from torchvision.ops.boxes import box_area
 
 def box_cxcywh_to_xyxy(x):
     x_c, y_c, w, h = x.unbind(-1)
+    # Clamp w, h to non-negative to prevent invalid boxes from AMP overflow
+    w = w.clamp(min=0)
+    h = h.clamp(min=0)
     b = [(x_c - 0.5 * w), (y_c - 0.5 * h),
          (x_c + 0.5 * w), (y_c + 0.5 * h)]
     return torch.stack(b, dim=-1)
@@ -73,6 +76,32 @@ def generalized_box_iou(boxes1, boxes2):
     area = wh[:, :, 0] * wh[:, :, 1]
 
     return iou - (area - union) / area
+
+
+def elementwise_giou(boxes1, boxes2):
+    """
+    Element-wise Generalized IoU between paired boxes.
+    boxes1, boxes2: [N, 4] in xyxy format, same length.
+    Returns: [N] GIoU values in [-1, 1].
+    """
+    area1 = (boxes1[:, 2] - boxes1[:, 0]) * (boxes1[:, 3] - boxes1[:, 1])
+    area2 = (boxes2[:, 2] - boxes2[:, 0]) * (boxes2[:, 3] - boxes2[:, 1])
+
+    lt = torch.max(boxes1[:, :2], boxes2[:, :2])
+    rb = torch.min(boxes1[:, 2:], boxes2[:, 2:])
+    wh = (rb - lt).clamp(min=0)
+    inter = wh[:, 0] * wh[:, 1]
+
+    union = area1 + area2 - inter
+    iou = inter / (union + 1e-6)
+
+    enclose_lt = torch.min(boxes1[:, :2], boxes2[:, :2])
+    enclose_rb = torch.max(boxes1[:, 2:], boxes2[:, 2:])
+    enclose_wh = (enclose_rb - enclose_lt).clamp(min=0)
+    enclose_area = enclose_wh[:, 0] * enclose_wh[:, 1]
+
+    return iou - (enclose_area - union) / (enclose_area + 1e-6)
+
 
 def trajectory_iou(trajs1, trajs2, mask1, mask2):
     area1 = (trajs1[..., 2] - trajs1[..., 0]) * (trajs1[..., 3] - trajs1[..., 1])

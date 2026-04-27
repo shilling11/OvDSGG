@@ -94,27 +94,33 @@ class SmoothedValue(object):
 
     @property
     def median(self):
+        if not self.deque:
+            return 0.0
         d = torch.tensor(list(self.deque))
         return d.median().item()
 
     @property
     def avg(self):
+        if not self.deque:
+            return 0.0
         d = torch.tensor(list(self.deque), dtype=torch.float32)
         return d.mean().item()
 
     @property
     def global_avg(self):
-        return self.total / self.count
+        return self.total / self.count if self.count > 0 else 0.0
 
     @property
     def max(self):
-        return max(self.deque)
+        return max(self.deque) if self.deque else 0.0
 
     @property
     def value(self):
-        return self.deque[-1]
+        return self.deque[-1] if self.deque else 0.0
 
     def __str__(self):
+        if not self.deque:
+            return self.fmt.format(median=0.0, avg=0.0, global_avg=0.0, max=0.0, value=0.0)
         return self.fmt.format(
             median=self.median,
             avg=self.avg,
@@ -458,7 +464,8 @@ def init_distributed_mode(args):
     print('| distributed init (rank {}): {}'.format(
         args.rank, args.dist_url), flush=True)
     torch.distributed.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
-                                         world_size=args.world_size, rank=args.rank)
+                                         world_size=args.world_size, rank=args.rank,
+                                         timeout=datetime.timedelta(seconds=7200))
     torch.distributed.barrier()
     setup_for_distributed(args.rank == 0)
 

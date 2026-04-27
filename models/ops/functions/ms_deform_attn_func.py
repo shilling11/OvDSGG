@@ -22,10 +22,15 @@ class MSDeformAttnFunction(Function):
     @staticmethod
     def forward(ctx, value, value_spatial_shapes, value_level_start_index, sampling_locations, attention_weights, im2col_step):
         ctx.im2col_step = im2col_step
+        # CUDA kernel only supports float32 — cast, run, cast back
+        input_dtype = value.dtype
         output = MSDA.ms_deform_attn_forward(
-            value, value_spatial_shapes, value_level_start_index, sampling_locations, attention_weights, ctx.im2col_step)
-        ctx.save_for_backward(value, value_spatial_shapes, value_level_start_index, sampling_locations, attention_weights)
-        return output
+            value.float(), value_spatial_shapes, value_level_start_index,
+            sampling_locations.float(), attention_weights.float(), ctx.im2col_step)
+        ctx.save_for_backward(value.float(), value_spatial_shapes, value_level_start_index,
+                              sampling_locations.float(), attention_weights.float())
+        ctx._input_dtype = input_dtype
+        return output.to(input_dtype)
 
     @staticmethod
     @once_differentiable
@@ -33,9 +38,10 @@ class MSDeformAttnFunction(Function):
         value, value_spatial_shapes, value_level_start_index, sampling_locations, attention_weights = ctx.saved_tensors
         grad_value, grad_sampling_loc, grad_attn_weight = \
             MSDA.ms_deform_attn_backward(
-                value, value_spatial_shapes, value_level_start_index, sampling_locations, attention_weights, grad_output, ctx.im2col_step)
-
-        return grad_value, None, None, grad_sampling_loc, grad_attn_weight, None
+                value, value_spatial_shapes, value_level_start_index, sampling_locations, attention_weights,
+                grad_output.float(), ctx.im2col_step)
+        input_dtype = ctx._input_dtype
+        return grad_value.to(input_dtype), None, None, grad_sampling_loc.to(input_dtype), grad_attn_weight.to(input_dtype), None
 
 
 def ms_deform_attn_core_pytorch(value, value_spatial_shapes, sampling_locations, attention_weights):

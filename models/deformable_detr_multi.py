@@ -25,6 +25,7 @@ from .matcher import build_matcher
 from .segmentation import (DETRsegm, PostProcessPanoptic, PostProcessSegm,
                            dice_loss, sigmoid_focal_loss)
 from .deformable_transformer_multi import build_deforamble_transformer
+import torchvision
 import copy
 
 
@@ -53,10 +54,91 @@ def get_sine_pos_embed(boxes, num_pos_feats=64):
 
     return torch.cat((pos_y, pos_x, pos_h, pos_w), dim=-1)
 
+class UnionFeatureExtractor(nn.Module):
+    """Extract visual features from union bounding boxes via ROIAlign."""
+    def __init__(self, backbone_dim, hidden_dim, roi_size=7, spatial_scale=1.0/16):
+        super().__init__()
+        self.roi_align = torchvision.ops.RoIAlign(
+            output_size=roi_size, spatial_scale=spatial_scale,
+            sampling_ratio=2, aligned=True
+        )
+        self.pool = nn.AdaptiveAvgPool2d(1)
+        self.proj = MLP(backbone_dim, hidden_dim, hidden_dim, 2)
+
+    def forward(self, backbone_features, union_boxes_xyxy, batch_indices):
+        """
+        backbone_features: [B, C, H', W'] raw spatial features from backbone
+        union_boxes_xyxy: [N, 4] in pixel coordinates
+        batch_indices: [N] batch index per box
+        Returns: [N, hidden_dim]
+        """
+        rois = torch.cat([batch_indices.unsqueeze(1).float(), union_boxes_xyxy], dim=1)
+        roi_feats = self.roi_align(backbone_features.float(), rois)
+        roi_feats = self.pool(roi_feats).flatten(1)
+        return self.proj(roi_feats.float())
+
+
+class SpatialMotionEncoder(nn.Module):
+    """Encode spatial relationship + motion between subject and object boxes."""
+    def __init__(self, hidden_dim):
+        super().__init__()
+        # 12-dim: spatial(5) + velocity(7)
+        self.encoder = MLP(12, hidden_dim, hidden_dim, 3)
+
+    def forward(self, sub_boxes, obj_boxes, sub_vel=None, obj_vel=None):
+        """
+        sub_boxes: [N, 4] cxcywh normalized [0,1]
+        obj_boxes: [N, 4] cxcywh normalized [0,1]
+        sub_vel: [N, 2] or None
+        obj_vel: [N, 2] or None
+        Returns: [N, hidden_dim]
+        """
+        sx, sy, sw, sh = sub_boxes.unbind(-1)
+        ox, oy, ow, oh = obj_boxes.unbind(-1)
+
+        # Spatial: relative position
+        dx = sx - ox
+        dy = sy - oy
+
+        # Spatial: relative size (log-space)
+        w_ratio = torch.log((sw + 1e-6) / (ow + 1e-6))
+        h_ratio = torch.log((sh + 1e-6) / (oh + 1e-6))
+
+        # Spatial: GIoU
+        giou = box_ops.elementwise_giou(
+            box_ops.box_cxcywh_to_xyxy(sub_boxes),
+            box_ops.box_cxcywh_to_xyxy(obj_boxes)
+        )
+
+        # Velocity features
+        if sub_vel is None:
+            sub_vel = torch.zeros(sub_boxes.shape[0], 2, device=sub_boxes.device)
+        if obj_vel is None:
+            obj_vel = torch.zeros(obj_boxes.shape[0], 2, device=obj_boxes.device)
+
+        vx_s, vy_s = sub_vel.unbind(-1)
+        vx_o, vy_o = obj_vel.unbind(-1)
+        rel_vx = vx_s - vx_o
+        rel_vy = vy_s - vy_o
+
+        sub_speed = torch.sqrt(vx_s**2 + vy_s**2 + 1e-8)
+        obj_speed = torch.sqrt(vx_o**2 + vy_o**2 + 1e-8)
+        vel_dot = (vx_s * vx_o + vy_s * vy_o) / (sub_speed * obj_speed + 1e-8)
+
+        features = torch.stack([
+            dx, dy, w_ratio, h_ratio, giou,
+            vx_s, vy_s, vx_o, vy_o,
+            rel_vx, rel_vy, vel_dot
+        ], dim=-1)
+
+        return self.encoder(features)
+
+
 class DeformableDETR(nn.Module):
     """ This is the Deformable DETR module that performs object detection """
-    def __init__(self, backbone, transformer, num_obj_classes, num_pred_classes, num_rel_queries, num_queries, num_feature_levels, 
-                 num_ref_frames = 3, aux_loss=True, with_box_refine=False, two_stage=False):
+    def __init__(self, backbone, transformer, num_obj_classes, num_pred_classes, num_rel_queries, num_queries, num_feature_levels,
+                 num_ref_frames = 3, aux_loss=True, with_box_refine=False, two_stage=False,
+                 use_union_features=False, use_spatial_motion_features=False):
         """ Initializes the model.
         Parameters:
             backbone: torch module of the backbone to be used. See backbone.py
@@ -88,7 +170,29 @@ class DeformableDETR(nn.Module):
         self.obj_pointer_k = MLP(hidden_dim, hidden_dim, hidden_dim, 2)
 
         self.rel_obj_attn = nn.MultiheadAttention(hidden_dim, 8, dropout=0.1, batch_first=True)
-        self.triplet_fusion = MLP(hidden_dim*3, hidden_dim, hidden_dim, 2)
+
+        # Union region features via ROIAlign
+        self.use_union_features = use_union_features
+        if use_union_features:
+            self.union_feature_extractor = UnionFeatureExtractor(
+                backbone_dim=backbone.num_channels[0],
+                hidden_dim=hidden_dim,
+                roi_size=7,
+                spatial_scale=1.0 / backbone.strides[0]
+            )
+
+        # Spatial + velocity relation encoding
+        self.use_spatial_motion_features = use_spatial_motion_features
+        if use_spatial_motion_features:
+            self.spatial_motion_encoder = SpatialMotionEncoder(hidden_dim=hidden_dim)
+
+        # Adjust triplet_fusion input dim based on active features
+        fusion_dim = hidden_dim * 3  # base: rel + sub + obj
+        if use_union_features:
+            fusion_dim += hidden_dim
+        if use_spatial_motion_features:
+            fusion_dim += hidden_dim
+        self.triplet_fusion = MLP(fusion_dim, hidden_dim, hidden_dim, 2)
 
         self.rel_query_embed = nn.Embedding(num_rel_queries, hidden_dim*2)
     
@@ -126,8 +230,8 @@ class DeformableDETR(nn.Module):
         self.obj_logit_scale = nn.Parameter(torch.tensor([0.0]))
         self.rel_logit_scale = nn.Parameter(torch.tensor([0.0]))
 
-        self.obj_class_bias = nn.Parameter(torch.ones(num_obj_classes) * bias_value)
-        self.rel_class_bias = nn.Parameter(torch.ones(num_pred_classes) * bias_value)
+        self.obj_class_bias = nn.Parameter(torch.ones(num_obj_classes + 1) * bias_value)
+        self.rel_class_bias = nn.Parameter(torch.ones(num_pred_classes + 1) * bias_value)
         # ###############
         # self.temp_class_embed.bias.data = torch.ones(num_obj_classes + 1) * bias_value
         nn.init.constant_(self.temp_bbox_embed.layers[-1].weight.data, 0)
@@ -178,7 +282,10 @@ class DeformableDETR(nn.Module):
         if not isinstance(samples, NestedTensor):
             samples = nested_tensor_from_tensor_list(samples)
         features, pos = self.backbone(samples)
-        # print('features[-1].tensors.shape', features[-1].tensors.shape)
+
+        # Store raw backbone features for ROIAlign (before input_proj)
+        if self.use_union_features:
+            self._backbone_raw_feats = features[0].tensors  # [B, backbone_dim, H', W']
 
         srcs = []
         masks = []
@@ -211,17 +318,20 @@ class DeformableDETR(nn.Module):
         hs_rel = hs[:, :, self.num_queries:]
 
         outputs_class = []
-        obj_text_embeddings_norm = F.normalize(obj_text_embeddings.to(hs_obj.dtype), p=2, dim=-1)
-        for c, x in zip(self.class_embed, hs_obj):
-            obj_features_norm = F.normalize(c(x), p=2, dim=-1)
-            obj_scale = self.obj_logit_scale.exp().clamp(max=20.0)
-            logits = (torch.matmul(obj_features_norm, obj_text_embeddings_norm.T) * obj_scale) + self.obj_class_bias
-            outputs_class.append(logits)
+        with torch.amp.autocast('cuda', enabled=False):
+            obj_text_embeddings_norm = F.normalize(obj_text_embeddings.to(hs_obj.dtype), p=2, dim=-1)
+            for c, x in zip(self.class_embed, hs_obj):
+                obj_features_norm = F.normalize(c(x), p=2, dim=-1)
+                obj_scale = self.obj_logit_scale.exp().clamp(max=20.0)
+                logits = (torch.matmul(obj_features_norm, obj_text_embeddings_norm.T) * obj_scale) + self.obj_class_bias
+                outputs_class.append(logits)
         outputs_class = torch.stack(outputs_class)
 
         outputs_coord = torch.stack([b(x).sigmoid() for b, x in zip(self.bbox_embed, hs_obj)])
 
-        text_embeddings = text_embeddings.detach()
+        # text_embeddings must NOT be detached so gradients can flow back to
+        # TextPromptEncoder.ctx when text prompts are active. obj_text_embeddings
+        # remains frozen (no text prompts for objects).
         obj_text_embeddings = obj_text_embeddings.detach()
 
         num_layers, bs, num_q, _ = hs_obj.shape
@@ -243,16 +353,83 @@ class DeformableDETR(nn.Module):
         obj_k = self.obj_pointer_k(obj_features_with_geom)
         outputs_obj_logits_flat = torch.bmm(obj_q, obj_k.transpose(-1,-2)) / math.sqrt(obj_q.size(-1))
 
-        sub_feat = torch.bmm(outputs_sub_logits_flat.softmax(-1), hs_obj_flat)
-        obj_feat = torch.bmm(outputs_obj_logits_flat.softmax(-1), hs_obj_flat)
-        hs_rel_flat = self.triplet_fusion(torch.cat([hs_rel_flat, sub_feat, obj_feat], dim=-1))
+        # Force FP32 for pointer softmax + relation features to avoid FP16 overflow
+        with torch.amp.autocast('cuda', enabled=False):
+            sub_attn = outputs_sub_logits_flat.float().softmax(-1)
+            obj_attn = outputs_obj_logits_flat.float().softmax(-1)
+            sub_feat = torch.bmm(sub_attn, hs_obj_flat.float())
+            obj_feat = torch.bmm(obj_attn, hs_obj_flat.float())
 
-        rel_features_flat = self.rel_proj_head(hs_rel_flat)
-        rel_features_norm = F.normalize(rel_features_flat, p=2, dim=-1)
-        text_embeddings_norm = F.normalize(text_embeddings.to(rel_features_norm.dtype), p=2, dim=-1)
-        rel_scale = self.rel_logit_scale.exp().clamp(max=20.0)
+            fusion_parts = [hs_rel_flat.float(), sub_feat, obj_feat]
 
-        outputs_rel_class_flat = (torch.matmul(rel_features_norm, text_embeddings_norm.T) * rel_scale) + self.rel_class_bias
+            # Union region features via ROIAlign
+            if self.use_union_features:
+                # Get predicted sub/obj boxes via weighted sum of object boxes
+                sub_boxes_flat = torch.bmm(sub_attn, coord_flat.float())  # [NL*B, NR, 4] cxcywh
+                obj_boxes_flat = torch.bmm(obj_attn, coord_flat.float())
+
+                # Convert to xyxy pixel coords for ROIAlign
+                img_h, img_w = samples.tensors.shape[-2:]
+                scale = torch.tensor([img_w, img_h, img_w, img_h],
+                                     device=sub_boxes_flat.device, dtype=sub_boxes_flat.dtype)
+
+                sub_xyxy = box_ops.box_cxcywh_to_xyxy(sub_boxes_flat) * scale
+                obj_xyxy = box_ops.box_cxcywh_to_xyxy(obj_boxes_flat) * scale
+
+                # Union box = enclosing box
+                union_xyxy = torch.cat([
+                    torch.min(sub_xyxy[..., :2], obj_xyxy[..., :2]),
+                    torch.max(sub_xyxy[..., 2:], obj_xyxy[..., 2:])
+                ], dim=-1)  # [NL*B, NR, 4]
+
+                # Clamp to image bounds (non-inplace to preserve autograd)
+                union_xyxy = torch.stack([
+                    union_xyxy[..., 0].clamp(min=0, max=img_w),
+                    union_xyxy[..., 1].clamp(min=0, max=img_h),
+                    union_xyxy[..., 2].clamp(min=0, max=img_w),
+                    union_xyxy[..., 3].clamp(min=0, max=img_h),
+                ], dim=-1)
+
+                NLB, NR = union_xyxy.shape[:2]
+                union_flat = union_xyxy.reshape(-1, 4)
+
+                # Batch indices: expand backbone features for decoder layers
+                batch_idx = torch.arange(NLB, device=union_flat.device)
+                batch_idx = batch_idx.unsqueeze(1).expand(-1, NR).reshape(-1)
+
+                backbone_expanded = self._backbone_raw_feats.repeat(num_layers, 1, 1, 1)
+
+                union_feat = self.union_feature_extractor(
+                    backbone_expanded, union_flat, batch_idx
+                )  # [NLB*NR, hidden_dim]
+                union_feat = union_feat.reshape(NLB, NR, -1)
+                fusion_parts.append(union_feat)
+
+            # Spatial + velocity features
+            if self.use_spatial_motion_features:
+                if not self.use_union_features:
+                    # Need to compute sub/obj boxes if not already done for union
+                    sub_boxes_flat = torch.bmm(sub_attn, coord_flat.float())
+                    obj_boxes_flat = torch.bmm(obj_attn, coord_flat.float())
+
+                NLB, NR = sub_boxes_flat.shape[:2]
+                spatial_feat = self.spatial_motion_encoder(
+                    sub_boxes_flat.reshape(-1, 4),
+                    obj_boxes_flat.reshape(-1, 4)
+                    # sub_vel and obj_vel default to None -> zeros for now
+                )  # [NLB*NR, hidden_dim]
+                spatial_feat = spatial_feat.reshape(NLB, NR, -1)
+                fusion_parts.append(spatial_feat)
+
+            hs_rel_flat_f32 = self.triplet_fusion(torch.cat(fusion_parts, dim=-1))
+
+            rel_features_flat = self.rel_proj_head(hs_rel_flat_f32)
+            with torch.amp.autocast('cuda', enabled=False):
+                rel_features_norm = F.normalize(rel_features_flat, p=2, dim=-1)
+                text_embeddings_norm = F.normalize(text_embeddings.to(rel_features_norm.dtype), p=2, dim=-1)
+                rel_scale = self.rel_logit_scale.exp().clamp(max=20.0)
+
+                outputs_rel_class_flat = (torch.matmul(rel_features_norm, text_embeddings_norm.T) * rel_scale) + self.rel_class_bias
 
         outputs_sub_logits = outputs_sub_logits_flat.view(num_layers, bs, self.num_rel_queries, num_q)
         outputs_obj_logits = outputs_obj_logits_flat.view(num_layers, bs, self.num_rel_queries, num_q)
@@ -734,26 +911,25 @@ class PostProcessVidVRD(nn.Module):
                 topk_rel_boxes[i]
             )
 
-            if vid_id not in results:
-                results[vid_id] = {
-                    'sub_trajectories': [{} for _ in range(100)],
-                    'obj_trajectories': [{} for _ in range(100)],
-                    'scores': scores[i],
-                    'predicates': predicates[i],
-                    'sub_labels': sub_l,
-                    'obj_labels': obj_l,
-                }
-
-            scale_fct = (torch.stack([target['size'][1], target['size'][0],
-                                      target['size'][1], target['size'][0]])
-                         if 'size' in target
+            # Use orig_size (original image dims) so boxes match GT pixel coords
+            sz_key = 'orig_size' if 'orig_size' in target else 'size'
+            scale_fct = (torch.stack([target[sz_key][1], target[sz_key][0],
+                                      target[sz_key][1], target[sz_key][0]])
+                         if sz_key in target
                          else torch.tensor([1, 1, 1, 1], device=scores.device))
             s_boxes = sub_boxes[i] * scale_fct
             o_boxes = obj_boxes[i] * scale_fct
 
-            for k in range(100):
-                results[vid_id]['sub_trajectories'][k][frame_id] = s_boxes[k].tolist()
-                results[vid_id]['obj_trajectories'][k][frame_id] = o_boxes[k].tolist()
+            if vid_id not in results:
+                results[vid_id] = {}
+            results[vid_id][frame_id] = {
+                'sub_boxes':  s_boxes.cpu(),
+                'obj_boxes':  o_boxes.cpu(),
+                'scores':     scores[i].cpu(),
+                'predicates': predicates[i].cpu(),
+                'sub_labels': sub_l.cpu(),
+                'obj_labels': obj_l.cpu(),
+            }
 
         return results
 
@@ -816,9 +992,11 @@ class PostProcessVidVRDSGCls(nn.Module):
             pred_classes = pred_logits[i].sigmoid().argmax(dim=-1)          # (num_obj_q,)
             rel_prob = out_rel_logits[i].sigmoid()                          # (num_rel_q, P)
 
-            scale_fct = (torch.stack([target['size'][1], target['size'][0],
-                                      target['size'][1], target['size'][0]]).float()
-                         if 'size' in target
+            # Use orig_size (original image dims) so boxes match GT pixel coords
+            sz_key = 'orig_size' if 'orig_size' in target else 'size'
+            scale_fct = (torch.stack([target[sz_key][1], target[sz_key][0],
+                                      target[sz_key][1], target[sz_key][0]]).float()
+                         if sz_key in target
                          else torch.ones(4, device=pred_boxes.device))
 
             for r in range(R):
@@ -894,9 +1072,11 @@ class PostProcessVidVRDPredCls(nn.Module):
             pred_boxes_xyxy = box_ops.box_cxcywh_to_xyxy(pred_boxes[i])
             rel_prob = out_rel_logits[i].sigmoid()   # (num_rel_q, P)
 
-            scale_fct = (torch.stack([target['size'][1], target['size'][0],
-                                      target['size'][1], target['size'][0]]).float()
-                         if 'size' in target
+            # Use orig_size (original image dims) so boxes match GT pixel coords
+            sz_key = 'orig_size' if 'orig_size' in target else 'size'
+            scale_fct = (torch.stack([target[sz_key][1], target[sz_key][0],
+                                      target[sz_key][1], target[sz_key][0]]).float()
+                         if sz_key in target
                          else torch.ones(4, device=pred_boxes.device))
 
             for r in range(R):
@@ -973,6 +1153,8 @@ def build(args):
         aux_loss=args.aux_loss,
         with_box_refine=args.with_box_refine,
         two_stage=args.two_stage,
+        use_union_features=getattr(args, 'use_union_features', False),
+        use_spatial_motion_features=getattr(args, 'use_spatial_motion_features', False),
     )
     if args.masks:
         model = DETRsegm(model, freeze_detr=(args.frozen_weights is not None))

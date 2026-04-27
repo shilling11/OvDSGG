@@ -135,6 +135,7 @@ def _compute_map_and_recall(preds, ground_truths, viou_threshold,
     prec    = tp_cum / np.maximum(tp_cum + fp_cum, np.finfo(np.float64).eps)
     ap      = compute_ap(rec, prec)
 
+
     # R@K: per-video top-K
     preds_by_vid = defaultdict(list)
     for p in preds:
@@ -183,11 +184,19 @@ def _compute_map_and_recall(preds, ground_truths, viou_threshold,
 # ---------------------------------------------------------------------------
 
 class VidVRDEvaluator(object):
-    def __init__(self, vidvrd_gt, eval_types, viou_threshold=0.5):
+    def __init__(self, vidvrd_gt, eval_types, viou_threshold=0.5,
+                 pred_split='all', obj_split='all',
+                 num_base_pred=None, num_base_obj=None):
         assert isinstance(eval_types, (list, tuple))
+        assert pred_split in ('all', 'base', 'novel')
+        assert obj_split  in ('all', 'base', 'novel')
         self.eval_types      = eval_types
         self.vidvrd_gt       = copy.deepcopy(vidvrd_gt)
         self.viou_threshold  = viou_threshold
+        self.pred_split      = pred_split
+        self.obj_split       = obj_split
+        self.num_base_pred   = num_base_pred
+        self.num_base_obj    = num_base_obj
 
         self.vid_ids         = []
         self.predictions     = defaultdict(list)
@@ -195,12 +204,42 @@ class VidVRDEvaluator(object):
 
         self._format_ground_truths()
 
+    def _passes_pred_split(self, predicate_label):
+        if self.pred_split == 'all' or self.num_base_pred is None:
+            return True
+        if self.pred_split == 'base':
+            return predicate_label <= self.num_base_pred
+        # novel
+        return predicate_label > self.num_base_pred
+
+    def _passes_obj_split(self, sub_label, obj_label):
+        # 'novel' = at least one of sub/obj is a novel class (standard OV-SGG convention)
+        # 'base' = both sub and obj are base classes
+        if self.obj_split == 'all' or self.num_base_obj is None:
+            return True
+        if self.obj_split == 'base':
+            return sub_label <= self.num_base_obj and obj_label <= self.num_base_obj
+        # novel
+        return sub_label > self.num_base_obj or obj_label > self.num_base_obj
+
     def _format_ground_truths(self):
+        n_total = 0
+        n_kept  = 0
         for vid_id, data in self.vidvrd_gt.items():
             relation_instances = data.get('relation_instances', [])
             trajectories       = data.get('trajectories', {})
 
             for rel in relation_instances:
+                n_total += 1
+                pred_label = rel.get('predicate_label', -1)
+                sub_label  = rel.get('subject_label',   -1)
+                obj_label  = rel.get('object_label',    -1)
+
+                if not self._passes_pred_split(pred_label):
+                    continue
+                if not self._passes_obj_split(sub_label, obj_label):
+                    continue
+
                 sub_tid_str = str(rel.get('subject_tid'))
                 obj_tid_str = str(rel.get('object_tid'))
 
@@ -212,13 +251,18 @@ class VidVRDEvaluator(object):
                             if str(f) in trajectories.get(obj_tid_str, {})}
 
                 self.ground_truths[vid_id].append({
-                    'subject':        rel.get('subject_label', -1),
-                    'object':         rel.get('object_label',  -1),
-                    'predicate':      rel.get('predicate_label', -1),
+                    'subject':        sub_label,
+                    'object':         obj_label,
+                    'predicate':      pred_label,
                     'sub_trajectory': sub_traj,
                     'obj_trajectory': obj_traj,
                     'matched':        False,
                 })
+                n_kept += 1
+
+        if self.pred_split != 'all' or self.obj_split != 'all':
+            print(f"[VidVRDEvaluator] GT filtered by pred_split='{self.pred_split}', "
+                  f"obj_split='{self.obj_split}': kept {n_kept}/{n_total} relations")
 
     # ------------------------------------------------------------------
     # Public interface
@@ -258,6 +302,13 @@ class VidVRDEvaluator(object):
 
     def accumulate(self):
         self.results = {}
+
+        # Summary of predictions vs GT
+        n_gt_rels = sum(len(v) for v in self.ground_truths.values())
+        pred_counts = {et: len(self.predictions[et]) for et in self.eval_types}
+        print(f"\n[Eval] GT: {len(self.ground_truths)} videos, {n_gt_rels} relations | "
+              f"Preds: {pred_counts}")
+
         for eval_type in self.eval_types:
             preds = self.predictions[eval_type]
 
@@ -431,6 +482,7 @@ class VidVRDEvaluator(object):
                     'obj_trajectory': obj_traj,
                 }
                 for k, (sub_traj, obj_traj) in enumerate(zip(sub_trajs, obj_trajs))
+                if scores[k] >= 0.01
             ])
         return results
 
@@ -480,10 +532,12 @@ class VidVRDEvaluator(object):
         """Flatten the (vid_id → {(s_tid, o_tid) → data}) structure from SGCls/PredCls
         postprocessors into the standard flat prediction list format.
 
-        For each GT pair we emit one prediction per predicate class, scored by the
-        model's per-class probability (averaged over frames).  This allows R@K and
-        mAP to be computed against the full predicate vocabulary.
+        For each GT pair we emit the top-K predicate classes (ranked by model
+        per-class probability averaged over frames). This matches the standard
+        SGG protocol for "unconstrained" PredCls and avoids the per-pair tail
+        of near-zero predictions inflating R@K while polluting mAP.
         """
+        TOP_K_PER_PAIR = 10
         results = []
         for vid_id, pair_dict in predictions.items():
             for (s_tid, o_tid, _gt_pred), data in pair_dict.items():
@@ -496,14 +550,18 @@ class VidVRDEvaluator(object):
                 sub_lbl  = data['sub_label']
                 obj_lbl  = data['obj_label']
 
-                # One prediction per predicate class
-                for pred_cls in range(rel_prob.shape[0]):
+                # Top-K predicate classes per pair
+                k_eff = min(TOP_K_PER_PAIR, rel_prob.shape[0])
+                top_scores, top_indices = rel_prob.topk(k_eff)
+                for score, pred_cls in zip(top_scores.tolist(), top_indices.tolist()):
+                    if score < 0.01:
+                        continue
                     results.append({
                         'video_id':       vid_id,
                         'subject':        sub_lbl,
                         'object':         obj_lbl,
                         'predicate':      pred_cls,
-                        'score':          rel_prob[pred_cls].item(),
+                        'score':          score,
                         'sub_trajectory': sub_traj,
                         'obj_trajectory': obj_traj,
                     })
