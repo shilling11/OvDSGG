@@ -477,8 +477,19 @@ def main(args):
     # Deferred checkpoint load for text_prompt_encoder (built after model checkpoint load)
     if text_prompt_encoder_module is not None and '_text_prompt_ckpt' in dir():
         if _text_prompt_ckpt is not None:
-            text_prompt_encoder_module.load_state_dict(_text_prompt_ckpt)
-            print("Loaded text_prompt_encoder state from checkpoint.")
+            # Strip tokenized_classes: it's a fixed buffer that changes size when
+            # num_pred_classes differs between training (72-way) and OV eval (133-way).
+            # strict=False alone doesn't help — PyTorch raises on size mismatches regardless.
+            # Only ctx (shape [n_ctx, 512]) needs to survive the checkpoint.
+            filtered = {k: v for k, v in _text_prompt_ckpt.items()
+                        if 'tokenized_classes' not in k}
+            missing, unexpected = text_prompt_encoder_module.load_state_dict(
+                filtered, strict=False)
+            if missing:
+                print(f"[text_prompt_encoder] WARNING: missing keys: {missing}")
+            ctx = text_prompt_encoder_module.ctx
+            print(f"Loaded text_prompt_encoder ctx from checkpoint "
+                  f"(shape={tuple(ctx.shape)}, norm={ctx.norm():.4f})")
 
     # Add text prompt encoder ctx parameters to the optimizer
     if text_prompt_encoder_module is not None:
