@@ -361,11 +361,6 @@ def evaluate(model, criterion, postprocessors, data_loader, base_ds, device, out
                                  **loss_dict_unscaled)
             metric_logger.update(class_error=loss_dict.get('class_error', torch.tensor(0.0)))
 
-        if args.pred_split == 'novel':
-            outputs['pred_rel_logits'][:, :, 1:num_base_pred + 1] = -1e9
-        elif args.pred_split == 'base':
-            outputs['pred_rel_logits'][:, :, num_base_pred + 1:] = -1e9
-
         results = postprocessors['vidvrd'](outputs, targets)
 
         if vidvrd_evaluator is not None:
